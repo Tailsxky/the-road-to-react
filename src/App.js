@@ -1,25 +1,13 @@
 import React, { Component } from 'react';
 //import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
 
-const list = [
-  {
-    title: 'React',
-    url: 'https://facebook.github.io/react/',
-    author: 'Jordan Walke',
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  },
-  {
-    title: 'Redux',
-    url: 'https://github.com/reactjs/redux',
-    author: 'Dan Abramov, Andrew Clark',
-    num_comments: 2,
-    points: 5,
-    objectID: 1,
-  },
-  ];
+const DEFAULT_QUERY = 'redux';
+
+const PATH_BASE = 'https://hn.algolia.com/api/v1';
+const PATH_SEARCH = '/search';
+const PARAM_SEARCH = 'query=';
 
   const largeColumn = {
     width: '40%',
@@ -42,19 +30,37 @@ const list = [
     
   }*/
 
-  const isSearched = searchTerm => item =>
-        item.title.toLowerCase().includes(searchTerm.toLowerCase());
+  //const isSearched = searchTerm => item =>
+  //      item.title.toLowerCase().includes(searchTerm.toLowerCase());
 
 class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      list,
-      searchTerm: '',
+      result: null,
+      searchTerm: DEFAULT_QUERY,
     };
-
+    this.setSearchTopStories = this.setSearchTopStories.bind(this);
+    this.fetchSearchTopStories = this.fetchSearchTopStories.bind(this);
+    this.onSearchSubmit = this.onSearchSubmit.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
+  }
+
+  setSearchTopStories(result){
+    this.setState({result});
+  }
+
+  fetchSearchTopStories(searchTerm){
+    axios(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
+    .then(response => response.JSON())
+    .then(result => this.setSearchTopStories(result))
+    .catch(e => e);
+  }
+
+  componentDidMount(){
+    const { searchTerm } = this.state;
+    this.fetchSearchTopStories(searchTerm);
   }
 
   onDismiss(id){
@@ -64,8 +70,10 @@ class App extends Component {
     const isNotId = item => {
       return item.objectID !== id;
     }
-    const updatedList = this.state.list.filter(isNotId)
-    this.setState({list: updatedList})
+    const updatedHits = this.state.result.hits.filter(isNotId)
+    this.setState({
+      result: {...this.state.result, hits: updatedHits}
+    })
   }
 
   
@@ -75,23 +83,38 @@ class App extends Component {
 
   }
 
+  onSearchSubmit(event){
+    const { searchTerm } = this.state;
+    this.fetchSearchTopStories(searchTerm);
+    event.preventDefault();
+  }
+
  
 
   render() {
     let helloWorld = "Welcome to the Road to React";
     let userName = "Tails"
-    const { searchTerm, list } = this.state
+
+    const { searchTerm, result } = this.state
+ 
     return (
       <div className="page">
       <div className="interactions">
       <h1>{helloWorld}</h1>
       <h2>{userName}</h2>
-      <Search value={searchTerm} onChange={this.onSearchChange}>
-      Search: </Search>
+      <Search value={searchTerm} 
+      onChange={this.onSearchChange}
+      onSubmit={this.onSearchSubmit}
+      >
+      Search </Search>
       </div>
-      <Table 
-        list={list} pattern={searchTerm} onDismiss={this.onDismiss}
+      { result &&
+       <Table 
+        list={result.hits}  
+        onDismiss={this.onDismiss}
       />
+      
+      }
       </div>
     );
   }
@@ -111,12 +134,12 @@ class App extends Component {
   }
 }*/
 
-const Search = ({ value, onChange, children}) =>
-    <form>
-      { children }
+const Search = ({ value, onChange, onSubmit, children}) =>
+    <form onSubmit={onSubmit}>
       <input type="text"
       value={value} onChange={onChange}
     />
+    <button type="submit">{ children }</button>
     </form>
   
 
@@ -144,9 +167,9 @@ const Search = ({ value, onChange, children}) =>
   }
 }*/
 
-const Table = ({ list, pattern, onDismiss }) => 
+const Table = ({ list, onDismiss }) => 
   <div className="table">
-    {list.filter(isSearched(pattern)).map(item => {
+    {list.map(item => {
       return <div key={item.objectID} className="table-row">
       <span style={ largeColumn }>
         <a href={item.url}>{item.title}</a>
