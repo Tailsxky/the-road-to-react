@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import renderer from 'react-test-renderer';
-import App from './App';
+import App, { Search, Button } from './App';
 
 describe('App', () => {
 it('renders without crashing', () => {
@@ -18,3 +18,35 @@ test('has a valid snapshot', () => {
   let tree = component.toJSON();
   expect(tree).toMatchSnapshot();
 })
+
+describe('Search', () => {
+  it('renders without crashing', () => {
+    const div = document.createElement('div');
+    ReactDOM.render(<Search>Search</Search>, div);
+    ReactDOM.unmountComponentAtNode(div);
+  });
+  });
+  
+  test('has a valid snapshot', () => {
+    const component = renderer.create(
+      <Search />
+    );
+    let tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+  })
+
+  describe('Button', () => {
+    it('renders without crashing', () => {
+      const div = document.createElement('div');
+      ReactDOM.render(<Button>Give Me More</Button>, div);
+      ReactDOM.unmountComponentAtNode(div);
+    });
+    });
+    
+    test('has a valid snapshot', () => {
+      const component = renderer.create(
+        <Button />
+      );
+      let tree = component.toJSON();
+      expect(tree).toMatchSnapshot();
+    })

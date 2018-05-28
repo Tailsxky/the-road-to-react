@@ -44,3 +44,26 @@ exports[`has a valid snapshot 1`] = `
   </div>
 </div>
 `;
+
+exports[`has a valid snapshot 2`] = `
+<form
+  onSubmit={undefined}
+>
+  <input
+    onChange={undefined}
+    type="text"
+    value={undefined}
+  />
+  <button
+    type="submit"
+  />
+</form>
+`;
+
+exports[`has a valid snapshot 3`] = `
+<button
+  className=""
+  onClick={undefined}
+  type="button"
+/>
+`;
