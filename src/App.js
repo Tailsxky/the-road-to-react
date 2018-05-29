@@ -152,8 +152,8 @@ class App extends Component {
 */
 
   render() {
-    let helloWorld = "Welcome to the Road to React";
-    let userName = "Tails"
+    let helloWorld = "Hacker News Search";
+    let userName = "By Tails"
 
     const { searchTerm, results, searchKey, error, isLoading//, sortKey, isSortReverse 
     } = this.state
